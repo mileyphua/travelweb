@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Local Exploro - Discover & Travel Tips</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%);
+        }
+        .destination-card:hover .destination-image {
+            transform: scale(1.05);
+        }
+        .destination-image {
+            transition: transform 0.3s ease;
+        }
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .map-container {
+            height: 300px;
+            background-image: url('https://maps.googleapis.com/maps/api/staticmap?center=40.7128,-74.0060&zoom=12&size=800x300&maptype=roadmap&markers=color:red%7C40.7128,-74.0060&key=YOUR_API_KEY');
+            background-size: cover;
+            background-position: center;
+        }
+        .filter-section {
+            transition: all 0.3s ease;
+            max-height: 500px;
+            overflow: hidden;
+        }
+        .filter-section.collapsed {
+            max-height: 60px;
+        }
+        .trip-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        .trip-card {
+            transition: all 0.3s ease;
+        }
+        .hide-scrollbar {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .tab-active {
+            border-bottom: 3px solid #3b82f6;
+            color: #3b82f6;
+            font-weight: 600;
+        }
+        .sticky-filters {
+            position: sticky;
+            top: 80px;
+            z-index: 10;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center space-x-4">
+                    <i class="fas fa-map-marked-alt text-3xl text-blue-500"></i>
+                    <span class="font-bold text-xl text-gray-800">Local Exploro</span>
+                </div>
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="https://localexploro.com/" class="text-gray-600 hover:text-blue-600">Home</a>
+                    <a href="#discover" class="text-blue-600 font-medium">Discover</a>
+                    <a href="#tips" class="text-gray-600 hover:text-blue-600">Tips</a>
+                    <a href="#" class="text-gray-600 hover:text-blue-600">Saved</a>
+                    <a href="#" class="text-gray-600 hover:text-blue-600">Trips</a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="hidden md:block relative">
+                        <i class="fas fa-bell text-gray-600 text-xl hover:text-blue-600 cursor-pointer"></i>
+                        <span class="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500"></span>
+                    </div>
+                    <div class="hidden md:block h-8 w-8 rounded-full bg-gray-300 overflow-hidden">
+                        <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Profile" class="h-full w-full object-cover">
+                    </div>
+                    <div class="md:hidden">
+                        <button id="menu-btn" class="text-gray-600 focus:outline-none">
+                            <i class="fas fa-bars text-2xl"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white py-2 px-4 border-t">
+            <a href="https://localexploro.com/" class="block py-2 text-gray-600 hover:text-blue-600">Home</a>
+            <a href="#discover" class="block py-2 text-blue-600 font-medium">Discover</a>
+            <a href="#tips" class="block py-2 text-gray-600 hover:text-blue-600">Tips</a>
+            <a href="#" class="block py-2 text-gray-600 hover:text-blue-600">Saved</a>
+            <a href="#" class="block py-2 text-gray-600 hover:text-blue-600">Trips</a>
+            <div class="border-t border-gray-200 mt-2 pt-2">
+                <a href="#" class="block py-2 text-gray-600 hover:text-blue-600">Profile</a>
+                <a href="#" class="block py-2 text-gray-600 hover:text-blue-600">Settings</a>
+                <a href="#" class="block py-2 text-gray-600 hover:text-blue-600">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Discover Section -->
+    <section id="discover" class="py-8">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-gray-800 mb-2">Discover Nearby Adventures</h1>
+                <p class="text-gray-600">Find hidden gems and popular spots based on your preferences</p>
+            </div>
+
+            <!-- Search and Filters -->
+            <div class="bg-white rounded-xl shadow-md p-6 mb-8 sticky-filters">
+                <div class="flex flex-col md:flex-row gap-4 mb-6">
+                    <div class="relative flex-grow">
+                        <input type="text" id="search-input" placeholder="Search destinations..." class="w-full py-3 px-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        <i class="fas fa-search absolute right-3 top-3.5 text-gray-500"></i>
+                    </div>
+                    <button id="filter-btn" class="bg-blue-600 text-white font-medium py-3 px-6 rounded-lg hover:bg-blue-700 transition duration-300 flex items-center justify-center">
+                        <i class="fas fa-filter mr-2"></i> Filters
+                    </button>
+                </div>
+
+                <!-- Filter Tabs -->
+                <div class="flex overflow-x-auto pb-2 hide-scrollbar">
+                    <div class="flex space-x-4">
+                        <button class="category-tab tab-active px-4 py-2 whitespace-nowrap" data-category="all">All</button>
+                        <button class="category-tab text-gray-600 px-4 py-2 whitespace-nowrap hover:text-blue-600" data-category="nature">Nature</button>
+                        <button class="category-tab text-gray-600 px-4 py-2 whitespace-nowrap hover:text-blue-600" data-category="culture">Culture</button>
+                        <button class="category-tab text-gray-600 px-4 py-2 whitespace-nowrap hover:text-blue-600" data-category="food">Food</button>
+                        <button class="category-tab text-gray-600 px-4 py-2 whitespace-nowrap hover:text-blue-600" data-category="adventure">Adventure</button>
+                        <button class="category-tab text-gray-600 px-4 py-2 whitespace-nowrap hover:text-blue-600" data-category="relaxation">Relaxation</button>
+                        <button class="category-tab text-gray-600 px-4 py-2 whitespace-nowrap hover:text-blue-600" data-category="shopping">Shopping</button>
+                        <button class="category-tab text-gray-600 px-4 py-2 whitespace-nowrap hover:text-blue-600" data-category="historical">Historical</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Advanced Filters -->
+            <div class="bg-white rounded-xl shadow-md p-6 mb-8 filter-section collapsed" id="advanced-filters">
+                <div class="flex justify-between items-center mb-4 cursor-pointer" id="filter-toggle">
+                    <h3 class="font-bold text-lg">Advanced Filters</h3>
+                    <i class="fas fa-chevron-down text-gray-500"></i>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label class="block text-gray-700 mb-2">Distance</label>
+                        <select id="distance-filter" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
+                            <option value="5">Within 5 miles</option>
+                            <option value="10">Within 10 miles</option>
+                            <option value="25" selected>Within 25 miles</option>
+                            <option value="50">Within 50 miles</option>
+                            <option value="any">Any distance</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 mb-2">Price Range</label>
+                        <div class="flex items-center space-x-2">
+                            <select id="price-filter" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
+                                <option value="free">Free</option>
+                                <option value="$">$</option>
+                                <option value="$$" selected>$$</option>
+                                <option value="$$$">$$$</option>
+                                <option value="any">Any price</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 mb-2">Rating</label>
+                        <select id="rating-filter" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
+                            <option value="4">4+ stars</option>
+                            <option value="3" selected>3+ stars</option>
+                            <option value="0">Any rating</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 mb-2">Activity Level</label>
+                        <select id="activity-filter" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
+                            <option value="relaxed">Relaxed</option>
+                            <option value="moderate" selected>Moderate</option>
+                            <option value="active">Active</option>
+                            <option value="any">Any level</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 mb-2">Duration</label>
+                        <select id="duration-filter" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
+                            <option value="1">Under 1 hour</option>
+                            <option value="4" selected>Half day</option>
+                            <option value="8">Full day</option>
+                            <option value="any">Any duration</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 mb-2">Best Time</label>
+                        <select id="time-filter" class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
+                            <option value="morning">Morning</option>
+                            <option value="afternoon" selected>Afternoon</option>
+                            <option value="evening">Evening</option>
+                            <option value="any">Any time</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex justify-end mt-6">
+                    <button id="reset-filters" class="bg-gray-200 text-gray-700 font-medium py-2 px-6 rounded-lg mr-4 hover:bg-gray-300 transition duration-300">
+                        Reset
+                    </button>
+                    <button id="apply-filters" class="bg-blue-600 text-white font-medium py-2 px-6 rounded-lg hover:bg-blue-700 transition duration-300">
+                        Apply Filters
+                    </button>
+                </div>
+            </div>
+
+            <!-- Results Count and Sort -->
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                <p id="results-count" class="text-gray-600 mb-2 md:mb-0">Showing <span class="font-bold">6</span> results near <span class="font-bold">your location</span></p>
+                <div class="flex items-center">
+                    <span class="text-gray-600 mr-2">Sort by:</span>
+                    <select id="sort-by" class="p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        <option value="recommended">Recommended</option>
+                        <option value="distance">Distance</option>
+                        <option value="rating">Rating</option>
+                        <option value="price-low">Price (low to high)</option>
+                        <option value="price-high">Price (high to low)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Discover Grid -->
+            <div id="discover-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Destination Card 1 -->
+                <div class="destination-card bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition duration-300" data-category="nature adventure" data-distance="45" data-price="free" data-rating="4.7" data-activity="moderate" data-duration="6" data-time="morning">
+                    <div class="relative h-48 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1470115636492-6d2b56f9146d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Mountain view" class="destination-image w-full h-full object-cover">
+                        <div class="absolute top-2 right-2 bg-white rounded-full p-2 shadow">
+                            <i class="fas fa-heart text-gray-400 hover:text-red-500 cursor-pointer"></i>
+                        </div>
+                        <div class="absolute bottom-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">
+                            <i class="fas fa-car mr-1"></i> 45 min drive
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-bold text-lg mb-1">Blue Ridge Mountains</h3>
+                        <div class="flex items-center mb-2">
+                            <div class="flex text-yellow-400">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                            </div>
+                            <span class="text-gray-600 text-sm ml-2">4.7 (128)</span>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-3">Stunning hiking trails with panoramic views perfect for a day trip.</p>
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold">Free</span>
+                            <div class="flex space-x-2">
+                                <button class="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-gray-300">Details</button>
+                                <button class="bg-blue-600 text-white px-3 py-1 rounded-full text-sm hover:bg-blue-700">Book</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Destination Card 2 -->
+                <div class="destination-card bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition duration-300" data-category="food culture" data-distance="1" data-price="free" data-rating="5.0" data-activity="relaxed" data-duration="2" data-time="morning">
+                    <div class="relative h-48 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1517825738774-7de9363ef735?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Farmers market" class="destination-image w-full h-full object-cover">
+                        <div class="absolute top-2 right-2 bg-white rounded-full p-2 shadow">
+                            <i class="fas fa-heart text-gray-400 hover:text-red-500 cursor-pointer"></i>
+                        </div>
+                        <div class="absolute bottom-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">
+                            <i class="fas fa-walking mr-1"></i> 15 min walk
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-bold text-lg mb-1">Downtown Farmers Market</h3>
+                        <div class="flex items-center mb-2">
+                            <div class="flex text-yellow-400">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <span class="text-gray-600 text-sm ml-2">5.0 (89)</span>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-3">Local produce, artisanal goods, and live music every Saturday morning.</p>
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold">Free</span>
+                            <div class="flex space-x-2">
+                                <button class="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-gray-300">Details</button>
+                                <button class="bg-blue-600 text-white px-3 py-1 rounded-full text-sm hover:bg-blue-700">Book</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Destination Card 3 -->
+                <div class="destination-card bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition duration-300" data-category="culture historical" data-distance="15" data-price="12" data-rating="4.2" data-activity="relaxed" data-duration="3" data-time="afternoon">
+                    <div class="relative h-48 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1506929562872-bb421503ef21?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Museum" class="destination-image w-full h-full object-cover">
+                        <div class="absolute top-2 right-2 bg-white rounded-full p-2 shadow">
+                            <i class="fas fa-heart text-gray-400 hover:text-red-500 cursor-pointer"></i>
+                        </div>
+                        <div class="absolute bottom-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">
+                            <i class="fas fa-subway mr-1"></i> 30 min transit
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-bold text-lg mb-1">Modern Art Gallery</h3>
+                        <div class="flex items-center mb-2">
+                            <div class="flex text-yellow-400">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="far fa-star"></i>
+                            </div>
+                            <span class="text-gray-600 text-sm ml-2">4.2 (214)</span>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-3">Contemporary exhibits from local and international artists.</p>
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold">$12</span>
+                            <div class="flex space-x-2">
+                                <button class="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-gray-300">Details</button>
+                                <button class="bg-blue-600 text-white px-3 py-1 rounded-full text-sm hover:bg-blue-700">Book</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Destination Card 4 -->
+                <div class="destination-card bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition duration-300" data-category="nature relaxation" data-distance="70" data-price="free" data-rating="5.0" data-activity="relaxed" data-duration="8" data-time="any">
+                    <div class="relative h-48 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1519046904884-53103b34b206?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Beach" class="destination-image w-full h-full object-cover">
+                        <div class="absolute top-2 right-2 bg-white rounded-full p-2 shadow">
+                            <i class="fas fa-heart text-gray-400 hover:text-red-500 cursor-pointer"></i>
+                        </div>
+                        <div class="absolute bottom-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">
+                            <i class="fas fa-car mr-1"></i> 1.5 hr drive
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-bold text-lg mb-1">Hidden Beach Cove</h3>
+                        <div class="flex items-center mb-2">
+                            <div class="flex text-yellow-400">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <span class="text-gray-600 text-sm ml-2">5.0 (42)</span>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-3">Secluded beach perfect for a peaceful getaway from the city.</p>
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold">Free</span>
+                            <div class="flex space-x-2">
+                                <button class="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-gray-300">Details</button>
+                                <button class="bg-blue-600 text-white px-3 py-1 rounded-full text-sm hover:bg-blue-700">Book</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Destination Card 5 -->
+                <div class="destination-card bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition duration-300" data-category="food culture" data-distance="0.5" data-price="$$" data-rating="4.5" data-activity="moderate" data-duration="2" data-time="any">
+                    <div class="relative h-48 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Food" class="destination-image w-full h-full object-cover">
+                        <div class="absolute top-2 right-2 bg-white rounded-full p-2 shadow">
+                            <i class="fas fa-heart text-gray-400 hover:text-red-500 cursor-pointer"></i>
+                        </div>
+                        <div class="absolute bottom-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">
+                            <i class="fas fa-walking mr-1"></i> 10 min walk
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-bold text-lg mb-1">Local Food Market</h3>
+                        <div class="flex items-center mb-2">
+                            <div class="flex text-yellow-400">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                            </div>
+                            <span class="text-gray-600 text-sm ml-2">4.5 (156)</span>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-3">Authentic local cuisine with fresh ingredients from regional producers.</p>
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold">$$</span>
+                            <div class="flex space-x-2">
+                                <button class="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-gray-300">Details</button>
+                                <button class="bg-blue-600 text-white px-3 py-1 rounded-full text-sm hover:bg-blue-700">Book</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Destination Card 6 -->
+                <div class="destination-card bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition duration-300" data-category="nature relaxation" data-distance="8" data-price="free" data-rating="4.9" data-activity="moderate" data-duration="4" data-time="any">
+                    <div class="relative h-48 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1506012787146-f92b2d7d6d96?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Park" class="destination-image w-full h-full object-cover">
+                        <div class="absolute top-2 right-2 bg-white rounded-full p-2 shadow">
+                            <i class="fas fa-heart text-gray-400 hover:text-red-500 cursor-pointer"></i>
+                        </div>
+                        <div class="absolute bottom-2 left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded">
+                            <i class="fas fa-bicycle mr-1"></i> 20 min bike
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h3 class="font-bold text-lg mb-1">Riverside Park</h3>
+                        <div class="flex items-center mb-2">
+                            <div class="flex text-yellow-400">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <span class="text-gray-600 text-sm ml-2">4.9 (201)</span>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-3">Beautiful park along the river with walking trails and picnic areas.</p>
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold">Free</span>
+                            <div class="flex space-x-2">
+                                <button class="bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm hover:bg-gray-300">Details</button>
+                                <button class="bg-blue-600 text-white px-3 py-1 rounded-full text-sm hover:bg-blue-700">Book</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <div class="flex justify-center mt-12">
+                <nav class="flex items-center space-x-2">
+                    <button class="px-3 py-1 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-100">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="px-3 py-1 rounded-lg bg-blue-600 text-white">1</button>
+                    <button class="px-3 py-1 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-100">2</button>
+                    <button class="px-3 py-1 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-100">3</button>
+                    <span class="px-2">...</span>
+                    <button class="px-3 py-1 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-100">8</button>
+                    <button class="px-3 py-1 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-100">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tips Section -->
+    <section id="tips" class="py-16 bg-gray-50">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">Local Travel Tips</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">Insider knowledge from locals and frequent travelers to help you make the most of your nearby adventures</p>
+            </div>
+
+            <!-- Tips Categories -->
+            <div class="flex overflow-x-auto pb-4 mb-8 hide-scrollbar">
+                <div class="flex space-x-2">
+                    <button class="tips-category px-4 py-2 bg-blue-600 text-white rounded-full whitespace-nowrap" data-tip-category="all">All Tips</button>
+                    <button class="tips-category px-4 py-2 bg-white text-gray-700 rounded-full whitespace-nowrap hover:bg-gray-100" data-tip-category="transportation">Transportation</button>
+                    <button class="tips-category px-4 py-2 bg-white text-gray-700 rounded-full whitespace-nowrap hover:bg-gray-100" data-tip-category="dining">Dining</button>
+                    <button class="tips-category px-4 py-2 bg-white text-gray-700 rounded-full whitespace-nowrap hover:bg-gray-100" data-tip-category="accommodation">Accommodation</button>
+                    <button class="tips-category px-4 py-2 bg-white text-gray-700 rounded-full whitespace-nowrap hover:bg-gray-100" data-tip-category="culture">Culture</button>
+                    <button class="tips-category px-4 py-2 bg-white text-gray-700 rounded-full whitespace-nowrap hover:bg-gray-100" data-tip-category="safety">Safety</button>
+                    <button class="tips-category px-4 py-2 bg-white text-gray-700 rounded-full whitespace-nowrap hover:bg-gray-100" data-tip-category="budget">Budget</button>
+                    <button class="tips-category px-4 py-2 bg-white text-gray-700 rounded-full whitespace-nowrap hover:bg-gray-100" data-tip-category="seasonal">Seasonal</button>
+                </div>
+            </div>
+
+            <!-- Featured Tip -->
+            <div class="bg-white rounded-xl shadow-md overflow-hidden mb-12">
+                <div class="md:flex">
+                    <div class="md:w-1/2 h-64 md:h-auto">
+                        <img src="https://images.unsplash.com/photo-1506929562872-bb421503ef21?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Featured tip" class="w-full h-full object-cover">
+                    </div>
+                    <div class="md:w-1/2 p-8">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-blue-100 w-10 h-10 rounded-full flex items-center justify-center mr-3">
+                                <i class="fas fa-lightbulb text-blue-600"></i>
+                            </div>
+                            <span class="font-medium text-gray-700">Featured Tip</span>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-4">10 Hidden Gems Only Locals Know About</h3>
+                        <p class="text-gray-600 mb-6">Discover the secret spots that don't appear in guidebooks but offer the most authentic experiences in the area. From tucked-away cafes to scenic viewpoints without the crowds.</p>
+                        <div class="flex items-center text-sm text-gray-500 mb-6">
+                            <i class="far fa-clock mr-2"></i>
+                            <span>8 min read</span>
+                            <span class="mx-2">•</span>
+                            <i class="fas fa-eye mr-2"></i>
+                            <span>1.2k views</span>
+                            <span class="mx-2">•</span>
+                            <i class="far fa-comment mr-2"></i>
+                            <span>24 comments</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-full overflow-hidden mr-3">
+                                <img src="https://randomuser.me/api/portraits/women/32.jpg" alt="Author" class="w-full h-full object-cover">
+                            </div>
+                            <div>
+                                <p class="font-medium">Sarah Johnson</p>
+                                <p class="text-sm text-gray-500">Local Guide • 5 years experience</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tips Grid -->
+            <div id="tips-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Tip 1 -->
+                <div class="tip-card bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition duration-300" data-tip-category="dining">
+                    <div class="h-48 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Local food" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-blue-100 w-10 h-10 rounded-full flex items-center justify-center mr-3">
+                                <i class="fas fa-utensils text-blue-600"></i>
+                            </div>
+                            <span class="font-medium text-gray-700">Food & Drink</span>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3">Best Local Eats Off the Beaten Path</h3>
+                        <p class="text-gray-600 mb-4">Discover 5 family-owned restaurants that serve authentic regional cuisine without the tourist crowds.</p>
+                        <div class="flex items-center text-sm text-gray-500">
+                            <i class="far fa-clock mr-2"></i>
+                            <span>3 min read</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tip 2 -->
+                <div class="tip-card bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition duration-300" data-tip-category="culture">
+                    <div class="h-48 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1506012787146-f92b2d7d6d96?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Park" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-green-100 w-10 h-10 rounded-full flex items-center justify-center mr-3">
+                                <i class="fas fa-leaf text-green-600"></i>
+                            </div>
+                            <span class="font-medium text-gray-700">Nature</span>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3">Secret Parks Locals Love</h3>
+                        <p class="text-gray-600 mb-4">Escape the crowded tourist spots with these 7 peaceful parks that offer the best views and relaxation.</p>
+                        <div class="flex items-center text-sm text-gray-500">
+                            <i class="far fa-clock mr-2"></i>
+                            <span>5 min read</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tip 3 -->
+                <div class="tip-card bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition duration-300" data-tip-category="transportation">
+                    <div class="h-48 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Transport" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-purple-100 w-10 h-10 rounded-full flex items-center justify-center mr-3">
+                                <i class="fas fa-subway text-purple-600"></i>
+                            </div>
+                            <span class="font-medium text-gray-700">Transportation</span>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3">Navigating the City Like a Local</h3>
+                        <p class="text-gray-600 mb-4">Learn the insider tricks for using public transportation efficiently and saving money on rides.</p>
+                        <div class="flex items-center text-sm text-gray-500">
+                            <i class="far fa-clock mr-2"></i>
+                            <span>4 min read</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tip 4 -->
+                <div class="tip-card bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition duration-300" data-tip-category="shopping">
+                    <div class="h-48 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Shopping" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-yellow-100 w-10 h-10 rounded-full flex items-center justify-center mr-3">
+                                <i class="fas fa-shopping-bag text-yellow-600"></i>
+                            </div>
+                            <span class="font-medium text-gray-700">Shopping</span>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3">Best Local Markets for Authentic Souvenirs</h3>
+                        <p class="text-gray-600 mb-4">Skip the tourist traps and find genuine local crafts at these 4 markets loved by residents.</p>
+                        <div class="flex items-center text-sm text-gray-500">
+                            <i class="far fa-clock mr-2"></i>
+                            <span>6 min read</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tip 5 -->
+                <div class="tip-card bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition duration-300" data-tip-category="nightlife">
+                    <div class="h-48 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1501594907352-04cda38ebc29?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Nightlife" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-pink-100 w-10 h-10 rounded-full flex items-center justify-center mr-3">
+                                <i class="fas fa-moon text-pink-600"></i>
+                            </div>
+                            <span class="font-medium text-gray-700">Nightlife</span>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3">Where Locals Go for Nightlife</h3>
+                        <p class="text-gray-600 mb-4">Discover the bars and clubs that offer authentic experiences without the tourist markups.</p>
+                        <div class="flex items-center text-sm text-gray-500">
+                            <i class="far fa-clock mr-2"></i>
+                            <span>4 min read</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tip 6 -->
+                <div class="tip-card bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition duration-300" data-tip-category="budget">
+                    <div class="h-48 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1501555088652-021faa1b3b1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Budget" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-green-100 w-10 h-10 rounded-full flex items-center justify-center mr-3">
+                                <i class="fas fa-wallet text-green-600"></i>
+                            </div>
+                            <span class="font-medium text-gray-700">Budget</span>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3">Exploring on a Budget: Free & Cheap Activities</h3>
+                        <p class="text-gray-600 mb-4">Enjoy the area without breaking the bank with these 12 affordable or free experiences.</p>
+                        <div class="flex items-center text-sm text-gray-500">
+                            <i class="far fa-clock mr-2"></i>
+                            <span>7 min read</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- View More Tips -->
+            <div class="text-center mt-12">
+                <button class="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition duration-300">
+                    View All Travel Tips <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trip Planning Section -->
+    <section class="py-16 bg-white">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">Plan Your Perfect Trip</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">Combine multiple destinations into a seamless itinerary with our trip planning tools</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Trip Card 1 -->
+                <div class="trip-card bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
+                    <div class="h-48 overflow-hidden relative">
+                        <img src="https://images.unsplash.com/photo-1506929562872-bb421503ef21?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Weekend getaway" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                        <div class="absolute bottom-0 left-0 p-6">
+                            <h3 class="text-xl font-bold text-white">Weekend Getaway</h3>
+                            <p class="text-gray-200">2 days • 3 destinations</p>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="flex -space-x-2">
+                                <div class="w-8 h-8 rounded-full overflow-hidden border-2 border-white">
+                                    <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User" class="w-full h-full object-cover">
+                                </div>
+                                <div class="w-8 h-8 rounded-full overflow-hidden border-2 border-white">
+                                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User" class="w-full h-full object-cover">
+                                </div>
+                            </div>
+                            <span class="text-sm text-gray-500 ml-2">+12 others saved this</span>
+                        </div>
+                        <ul class="space-y-3 mb-6">
+                            <li class="flex items-center">
+                                <div class="bg-blue-100 w-6 h-6 rounded-full flex items-center justify-center mr-3">
+                                    <i class="fas fa-mountain text-blue-600 text-xs"></i>
+                                </div>
+                                <span>Blue Ridge Hiking Trail</span>
+                            </li>
+                            <li class="flex items-center">
+                                <div class="bg-purple-100 w-6 h-6 rounded-full flex items-center justify-center mr-3">
+                                    <i class="fas fa-utensils text-purple-600 text-xs"></i>
+                                </div>
+                                <span>Local Food Market</span>
+                            </li>
+                            <li class="flex items-center">
+                                <div class="bg-green-100 w-6 h-6 rounded-full flex items-center justify-center mr-3">
+                                    <i class="fas fa-spa text-green-600 text-xs"></i>
+                                </div>
+                                <span>Mountain Spa Retreat</span>
+                            </li>
+                        </ul>
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold">$120 per person</span>
+                            <button class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700">View Itinerary</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Trip Card 2 -->
+                <div class="trip-card bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
+                    <div class="h-48 overflow-hidden relative">
+                        <img src="https://images.unsplash.com/photo-1470115636492-6d2b56f9146d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Family day out" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                        <div class="absolute bottom-0 left-0 p-6">
+                            <h3 class="text-xl font-bold text-white">Family Day Out</h3>
+                            <p class="text-gray-200">1 day • 4 destinations</p>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="flex -space-x-2">
+                                <div class="w-8 h-8 rounded-full overflow-hidden border-2 border-white">
+                                    <img src="https://randomuser.me/api/portraits/women/12.jpg" alt="User" class="w-full h-full object-cover">
+                                </div>
+                                <div class="w-8 h-8 rounded-full overflow-hidden border-2 border-white">
+                                    <img src="https://randomuser.me/api/portraits/men/22.jpg" alt="User" class="w-full h-full object-cover">
+                                </div>
+                            </div>
+                            <span class="text-sm text-gray-500 ml-2">+8 others saved this</span>
+                        </div>
+                        <ul class="space-y-3 mb-6">
+                            <li class="flex items-center">
+                                <div class="bg-yellow-100 w-6 h-6 rounded-full flex items-center justify-center mr-3">
+                                    <i class="fas fa-paw text-yellow-600 text-xs"></i>
+                                </div>
+                                <span>Children's Zoo</span>
+                            </li>
+                            <li class="flex items-center">
+                                <div class="bg-red-100 w-6 h-6 rounded-full flex items-center justify-center mr-3">
+                                    <i class="fas fa-ice-cream text-red-600 text-xs"></i>
+                                </div>
+                                <span>Ice Cream Parlor</span>
+                            </li>
+                            <li class="flex items-center">
+                                <div class="bg-blue-100 w-6 h-6 rounded-full flex items-center justify-center mr-3">
+                                    <i class="fas fa-swimming-pool text-blue-600 text-xs"></i>
+                                </div>
+                                <span>Water Park</span>
+                            </li>
+                            <li class="flex items-center">
+                                <div class="bg-green-100 w-6 h-6 rounded-full flex items-center justify-center mr-3">
+                                    <i class="fas fa-pizza-slice text-green-600 text-xs"></i>
+                                </div>
+                                <span>Family Restaurant</span>
+                            </li>
+                        </ul>
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold">$65 per person</span>
+                            <button class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700">View Itinerary</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Trip Card 3 -->
+                <div class="trip-card bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
+                    <div class="h-48 overflow-hidden relative">
+                        <img src="https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Cultural tour" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                        <div class="absolute bottom-0 left-0 p-6">
+                            <h3 class="text-xl font-bold text-white">Cultural Tour</h3>
+                            <p class="text-gray-200">3 days • 5 destinations</p>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="flex -space-x-2">
+                                <div class="w-8 h-8 rounded-full overflow-hidden border-2 border-white">
+                                    <img src="https://randomuser.me/api/portraits/men/44.jpg" alt="User" class="w-full h-full object-cover">
+                                </div>
+                                <div class="w-8 h-8 rounded-full overflow-hidden border-2 border-white">
+                                    <img src="https://randomuser.me/api/portraits/women/22.jpg" alt="User" class="w-full h-full object-cover">
+                                </div>
+                            </div>
+                            <span class="text-sm text-gray-500 ml-2">+15 others saved this</span>
+                        </div>
+                        <ul class="space-y-3 mb-6">
+                            <li class="flex items-center">
+                                <div class="bg-purple-100 w-6 h-6 rounded-full flex items-center justify-center mr-3">
+                                    <i class="fas fa-landmark text-purple-600 text-xs"></i>
+                                </div>
+                                <span>Modern Art Museum</span>
+                            </li>
+                            <li class="flex items-center">
+                                <div class="bg-yellow-100 w-6 h-6 rounded-full flex items-center justify-center mr-3">
+                                    <i class="fas fa-theater-masks text-yellow-600 text-xs"></i>
+                                </div>
+                                <span>Local Theater Performance</span>
+                            </li>
+                            <li class="flex items-center">
+                                <div class="bg-blue-100 w-6 h-6 rounded-full flex items-center justify-center mr-3">
+                                    <i class="fas fa-utensils text-blue-600 text-xs"></i>
+                                </div>
+                                <span>Fine Dining Experience</span>
+                            </li>
+                        </ul>
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold">$210 per person</span>
+                            <button class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700">View Itinerary</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Local Exploro</h3>
+                    <p class="text-gray-400">Discover hidden gems and local favorites wherever you go.</p>
+                    <div class="flex space-x-4 mt-4">
+                        <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white"><i class="fab fa-pinterest"></i></a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4">Explore</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white">Destinations</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Travel Guides</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Trip Planner</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Local Events</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4">Company</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white">About Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Careers</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Press</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4">Support</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white">Help Center</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Safety</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Terms</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white">Privacy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2023 Local Exploro. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        document.getElementById('menu-btn').addEventListener('click', function() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        });
+
+        // Advanced filters toggle
+        document.getElementById('filter-toggle').addEventListener('click', function() {
+            const filters = document.getElementById('advanced-filters');
+            const icon = this.querySelector('i');
+            
+            filters.classList.toggle('collapsed');
+            
+            if (filters.classList.contains('collapsed')) {
+                icon.classList.remove('fa-chevron-up');
+                icon.classList.add('fa-chevron-down');
+            } else {
+                icon.classList.remove('fa-chevron-down');
+                icon.classList.add('fa-chevron-up');
+            }
+        });
+
+        // Filter button to show/hide advanced filters
+        document.getElementById('filter-btn').addEventListener('click', function() {
+            const filters = document.getElementById('advanced-filters');
+            const icon = document.getElementById('filter-toggle').querySelector('i');
+            
+            if (filters.classList.contains('collapsed')) {
+                filters.classList.remove('collapsed');
+                icon.classList.remove('fa-chevron-down');
+                icon.classList.add('fa-chevron-up');
+            } else {
+                filters.classList.add('collapsed');
+                icon.classList.remove('fa-chevron-up');
+                icon.classList.add('fa-chevron-down');
+            }
+        });
+
+        // Category tabs functionality
+        const categoryTabs = document.querySelectorAll('.category-tab');
+        categoryTabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Remove active class from all tabs
+                categoryTabs.forEach(t => t.classList.remove('tab-active'));
+                // Add active class to clicked tab
+                this.classList.add('tab-active');
+                
+                const category = this.getAttribute('data-category');
+                filterDestinations();
+            });
+        });
+
+        // Tips category tabs functionality
+        const tipsCategories = document.querySelectorAll('.tips-category');
+        tipsCategories.forEach(tab => {
+            tab.addEventListener('click', function() {
+                // Remove active class from all tabs
+                tipsCategories.forEach(t => {
+                    t.classList.remove('bg-blue-600', 'text-white');
+                    t.classList.add('bg-white', 'text-gray-700');
+                });
+                // Add active class to clicked tab
+                this.classList.remove('bg-white', 'text-gray-700');
+                this.classList.add('bg-blue-600', 'text-white');
+                
+                const category = this.getAttribute('data-tip-category');
+                filterTips(category);
+            });
+        });
+
+        // Apply filters button
+        document.getElementById('apply-filters').addEventListener('click', function() {
+            filterDestinations();
+        });
+
+        // Reset filters button
+        document.getElementById('reset-filters').addEventListener('click', function() {
+            // Reset all filter selects to default values
+            document.getElementById('distance-filter').value = '25';
+            document.getElementById('price-filter').value = '$$';
+            document.getElementById('rating-filter').value = '3';
+            document.getElementById('activity-filter').value = 'moderate';
+            document.getElementById('duration-filter').value = '4';
+            document.getElementById('time-filter').value = 'afternoon';
+            
+            // Reset category tabs
+            categoryTabs.forEach(t => t.classList.remove('tab-active'));
+            document.querySelector('.category-tab[data-category="all"]').classList.add('tab-active');
+            
+            // Reset search
+            document.getElementById('search-input').value = '';
+            
+            // Apply reset filters
+            filterDestinations();
+        });
+
+        // Search functionality
+        document.getElementById('search-input').addEventListener('input', function() {
+            filterDestinations();
+        });
+
+        // Sort functionality
+        document.getElementById('sort-by').addEventListener('change', function() {
+            filterDestinations();
+        });
+
+        // Filter destinations based on all criteria
+        function filterDestinations() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const distanceFilter = document.getElementById('distance-filter').value;
+            const priceFilter = document.getElementById('price-filter').value;
+            const ratingFilter = parseFloat(document.getElementById('rating-filter').value);
+            const activityFilter = document.getElementById('activity-filter').value;
+            const durationFilter = document.getElementById('duration-filter').value;
+            const timeFilter = document.getElementById('time-filter').value;
+            const sortBy = document.getElementById('sort-by').value;
+            
+            // Get active category
+            let activeCategory = 'all';
+            document.querySelectorAll('.category-tab').forEach(tab => {
+                if (tab.classList.contains('tab-active')) {
+                    activeCategory = tab.getAttribute('data-category');
+                }
+            });
+            
+            const destinationCards = document.querySelectorAll('.destination-card');
+            let visibleCount = 0;
+            
+            destinationCards.forEach(card => {
+                const title = card.querySelector('h3').textContent.toLowerCase();
+                const description = card.querySelector('p').textContent.toLowerCase();
+                const categories = card.getAttribute('data-category');
+                const distance = parseInt(card.getAttribute('data-distance'));
+                const price = card.getAttribute('data-price');
+                const rating = parseFloat(card.getAttribute('data-rating'));
+                const activity = card.getAttribute('data-activity');
+                const duration = card.getAttribute('data-duration');
+                const time = card.getAttribute('data-time');
+                
+                // Check if card matches all filters
+                const matchesSearch = searchTerm === '' || 
+                    title.includes(searchTerm) || 
+                    description.includes(searchTerm);
+                
+                const matchesCategory = activeCategory === 'all' || 
+                    categories.includes(activeCategory);
+                
+                const matchesDistance = distanceFilter === 'any' || 
+                    (distanceFilter === '5' && distance <= 5) ||
+                    (distanceFilter === '10' && distance <= 10) ||
+                    (distanceFilter === '25' && distance <= 25) ||
+                    (distanceFilter === '50' && distance <= 50);
+                
+                const matchesPrice = priceFilter === 'any' || 
+                    (priceFilter === 'free' && price === 'free') ||
+                    (priceFilter === '$' && price === '$') ||
+                    (priceFilter === '$$' && price === '$$') ||
+                    (priceFilter === '$$$' && price === '$$$');
+                
+                const matchesRating = ratingFilter === 0 || rating >= ratingFilter;
+                
+                const matchesActivity = activityFilter === 'any' || 
+                    activity === activityFilter;
+                
+                const matchesDuration = durationFilter === 'any' || 
+                    (durationFilter === '1' && duration <= 1) ||
+                    (durationFilter === '4' && duration <= 4) ||
+                    (durationFilter === '8' && duration <= 8);
+                
+                const matchesTime = timeFilter === 'any' || 
+                    time === timeFilter || 
+                    time === 'any';
+                
+                if (matchesSearch && matchesCategory && matchesDistance && matchesPrice && 
+                    matchesRating && matchesActivity && matchesDuration && matchesTime) {
+                    card.style.display = 'block';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            // Update results count
+            document.getElementById('results-count').innerHTML = 
+                `Showing <span class="font-bold">${visibleCount}</span> results near <span class="font-bold">your location</span>`;
+            
+            // Sort results if needed
+            if (sortBy !== 'recommended') {
+                sortResults(sortBy);
+            }
+        }
+
+        // Sort results based on selected option
+        function sortResults(sortBy) {
+            const grid = document.getElementById('discover-grid');
+            const cards = Array.from(document.querySelectorAll('.destination-card'));
+            
+            cards.sort((a, b) => {
+                if (sortBy === 'distance') {
+                    const aDistance = parseInt(a.getAttribute('data-distance'));
+                    const bDistance = parseInt(b.getAttribute('data-distance'));
+                    return aDistance - bDistance;
+                } else if (sortBy === 'rating') {
+                    const aRating = parseFloat(a.getAttribute('data-rating'));
+                    const bRating = parseFloat(b.getAttribute('data-rating'));
+                    return bRating - aRating;
+                } else if (sortBy === 'price-low') {
+                    const aPrice = a.getAttribute('data-price') === 'free' ? 0 : 
+                                  (a.getAttribute('data-price') === '$' ? 1 : 
+                                  (a.getAttribute('data-price') === '$$' ? 2 : 3));
+                    const bPrice = b.getAttribute('data-price') === 'free' ? 0 : 
+                                  (b.getAttribute('data-price') === '$' ? 1 : 
+                                  (b.getAttribute('data-price') === '$$' ? 2 : 3));
+                    return aPrice - bPrice;
+                } else if (sortBy === 'price-high') {
+                    const aPrice = a.getAttribute('data-price') === 'free' ? 0 : 
+                                  (a.getAttribute('data-price') === '$' ? 1 : 
+                                  (a.getAttribute('data-price') === '$$' ? 2 : 3));
+                    const bPrice = b.getAttribute('data-price') === 'free' ? 0 : 
+                                  (b.getAttribute('data-price') === '$' ? 1 : 
+                                  (b.getAttribute('data-price') === '$$' ? 2 : 3));
+                    return bPrice - aPrice;
+                }
+                return 0;
+            });
+            
+            // Re-append sorted cards
+            cards.forEach(card => grid.appendChild(card));
+        }
+
+        // Filter tips by category
+        function filterTips(category) {
+            const tipCards = document.querySelectorAll('.tip-card');
+            
+            tipCards.forEach(card => {
+                if (category === 'all' || card.getAttribute('data-tip-category') === category) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Initialize with all destinations and tips visible
+        filterDestinations();
+        filterTips('all');
+    </script>
+</body>
+</html>
