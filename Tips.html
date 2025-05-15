@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Tips for Explorers</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .tip-card:hover .tip-image {
+            transform: scale(1.05);
+        }
+        .tip-image {
+            transition: transform 0.3s ease;
+        }
+        .category-badge {
+            transition: all 0.2s ease;
+        }
+        .category-badge:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <!-- Travel Tips Section -->
+    <section id="travel-tips" class="py-16 bg-gray-50">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">Essential Travel Tips</h2>
+                <p class="text-gray-600 max-w-2xl mx-auto">Expert advice to help you travel smarter, safer, and more comfortably</p>
+            </div>
+
+            <!-- Tips Categories -->
+            <div class="flex overflow-x-auto pb-4 mb-8 hide-scrollbar">
+                <div class="flex space-x-2">
+                    <button class="px-4 py-2 bg-blue-600 text-white rounded-full whitespace-nowrap category-badge">All Tips</button>
+                    <button class="px-4 py-2 bg-white text-gray-700 rounded-full whitespace-nowrap hover:bg-gray-100 category-badge">Packing</button>
+                    <button class="px-4 py-2 bg-white text-gray-700 rounded-full whitespace-nowrap hover:bg-gray-100 category-badge">Transport</button>
+                    <button class="px-4 py-2 bg-white text-gray-700 rounded-full whitespace-nowrap hover:bg-gray-100 category-badge">Accommodation</button>
+                    <button class="px-4 py-2 bg-white text-gray-700 rounded-full whitespace-nowrap hover:bg-gray-100 category-badge">Food</button>
+                    <button class="px-4 py-2 bg-white text-gray-700 rounded-full whitespace-nowrap hover:bg-gray-100 category-badge">Safety</button>
+                    <button class="px-4 py-2 bg-white text-gray-700 rounded-full whitespace-nowrap hover:bg-gray-100 category-badge">Budget</button>
+                    <button class="px-4 py-2 bg-white text-gray-700 rounded-full whitespace-nowrap hover:bg-gray-100 category-badge">Culture</button>
+                </div>
+            </div>
+
+            <!-- Featured Tip -->
+            <div class="bg-white rounded-xl shadow-md overflow-hidden mb-12 transition duration-300 hover:shadow-lg">
+                <div class="md:flex">
+                    <div class="md:w-1/2 h-64 md:h-auto overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1506929562872-bb421503ef21?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Featured tip" class="w-full h-full object-cover">
+                    </div>
+                    <div class="md:w-1/2 p-8">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-blue-100 w-10 h-10 rounded-full flex items-center justify-center mr-3">
+                                <i class="fas fa-star text-blue-600"></i>
+                            </div>
+                            <span class="font-medium text-gray-700">Editor's Pick</span>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-4">The Ultimate Packing Checklist for Any Trip</h3>
+                        <p class="text-gray-600 mb-6">After years of traveling, we've perfected a packing list that works for any destination and season. Learn what essentials you need and what you can leave behind to travel lighter and smarter.</p>
+                        <div class="flex items-center text-sm text-gray-500 mb-6">
+                            <i class="far fa-clock mr-2"></i>
+                            <span>10 min read</span>
+                            <span class="mx-2">•</span>
+                            <i class="fas fa-eye mr-2"></i>
+                            <span>2.4k views</span>
+                            <span class="mx-2">•</span>
+                            <i class="far fa-comment mr-2"></i>
+                            <span>36 comments</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-10 h-10 rounded-full overflow-hidden mr-3">
+                                <img src="https://randomuser.me/api/portraits/women/32.jpg" alt="Author" class="w-full h-full object-cover">
+                            </div>
+                            <div>
+                                <p class="font-medium">Sarah Johnson</p>
+                                <p class="text-sm text-gray-500">Travel Expert • Visited 45 countries</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tips Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Tip 1 - Packing -->
+                <div class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition duration-300 tip-card">
+                    <div class="h-48 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1555396273-367ea4eb4db5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Packing tips" class="w-full h-full object-cover tip-image">
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-blue-100 w-10 h-10 rounded-full flex items-center justify-center mr-3">
+                                <i class="fas fa-suitcase text-blue-600"></i>
+                            </div>
+                            <span class="font-medium text-gray-700">Packing</span>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3">10 Packing Hacks Every Traveler Should Know</h3>
+                        <p class="text-gray-600 mb-4">From rolling clothes to using shower caps for shoes, these simple tricks will maximize your luggage space and keep items organized.</p>
+                        <div class="flex items-center text-sm text-gray-500">
+                            <i class="far fa-clock mr-2"></i>
+                            <span>5 min read</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tip 2 - Transportation -->
+                <div class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition duration-300 tip-card">
+                    <div class="h-48 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1506012787146-f92b2d7d6d96?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Transportation" class="w-full h-full object-cover tip-image">
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-green-100 w-10 h-10 rounded-full flex items-center justify-center mr-3">
+                                <i class="fas fa-bus text-green-600"></i>
+                            </div>
+                            <span class="font-medium text-gray-700">Transport</span>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3">Getting Around Like a Local</h3>
+                        <p class="text-gray-600 mb-4">Master public transportation in any city with these apps and tips that will save you money and time during your travels.</p>
+                        <div class="flex items-center text-sm text-gray-500">
+                            <i class="far fa-clock mr-2"></i>
+                            <span>6 min read</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tip 3 - Accommodation -->
+                <div class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition duration-300 tip-card">
+                    <div class="h-48 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Accommodation" class="w-full h-full object-cover tip-image">
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-purple-100 w-10 h-10 rounded-full flex items-center justify-center mr-3">
+                                <i class="fas fa-hotel text-purple-600"></i>
+                            </div>
+                            <span class="font-medium text-gray-700">Accommodation</span>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3">Choosing the Perfect Place to Stay</h3>
+                        <p class="text-gray-600 mb-4">Hotels, hostels, or Airbnb? Learn how to pick the best accommodation for your travel style and budget.</p>
+                        <div class="flex items-center text-sm text-gray-500">
+                            <i class="far fa-clock mr-2"></i>
+                            <span>7 min read</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tip 4 - Food -->
+                <div class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition duration-300 tip-card">
+                    <div class="h-48 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Local food" class="w-full h-full object-cover tip-image">
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-yellow-100 w-10 h-10 rounded-full flex items-center justify-center mr-3">
+                                <i class="fas fa-utensils text-yellow-600"></i>
+                            </div>
+                            <span class="font-medium text-gray-700">Food</span>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3">Eating Like a Local Without Getting Sick</h3>
+                        <p class="text-gray-600 mb-4">How to enjoy street food safely and find authentic dining experiences that most tourists miss.</p>
+                        <div class="flex items-center text-sm text-gray-500">
+                            <i class="far fa-clock mr-2"></i>
+                            <span>8 min read</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tip 5 - Safety -->
+                <div class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition duration-300 tip-card">
+                    <div class="h-48 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1501594907352-04cda38ebc29?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Safety" class="w-full h-full object-cover tip-image">
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-red-100 w-10 h-10 rounded-full flex items-center justify-center mr-3">
+                                <i class="fas fa-shield-alt text-red-600"></i>
+                            </div>
+                            <span class="font-medium text-gray-700">Safety</span>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3">Essential Safety Tips for Solo Travelers</h3>
+                        <p class="text-gray-600 mb-4">Protect yourself and your belongings with these practical safety measures that every solo traveler should follow.</p>
+                        <div class="flex items-center text-sm text-gray-500">
+                            <i class="far fa-clock mr-2"></i>
+                            <span>9 min read</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tip 6 - Budget -->
+                <div class="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition duration-300 tip-card">
+                    <div class="h-48 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1501555088652-021faa1b3b1d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" alt="Budget travel" class="w-full h-full object-cover tip-image">
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center mb-4">
+                            <div class="bg-green-100 w-10 h-10 rounded-full flex items-center justify-center mr-3">
+                                <i class="fas fa-wallet text-green-600"></i>
+                            </div>
+                            <span class="font-medium text-gray-700">Budget</span>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3">Traveling on $50 a Day: How to Make It Work</h3>
+                        <p class="text-gray-600 mb-4">Real strategies for stretching your travel budget without sacrificing experiences, from finding cheap eats to free attractions.</p>
+                        <div class="flex items-center text-sm text-gray-500">
+                            <i class="far fa-clock mr-2"></i>
+                            <span>10 min read</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- View More Tips -->
+            <div class="text-center mt-12">
+                <button class="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition duration-300 flex items-center mx-auto">
+                    Explore More Travel Tips <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Simple category filter functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const categoryButtons = document.querySelectorAll('.category-badge');
+            
+            categoryButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Remove active class from all buttons
+                    categoryButtons.forEach(btn => {
+                        btn.classList.remove('bg-blue-600', 'text-white');
+                        btn.classList.add('bg-white', 'text-gray-700', 'hover:bg-gray-100');
+                    });
+                    
+                    // Add active class to clicked button
+                    this.classList.remove('bg-white', 'text-gray-700', 'hover:bg-gray-100');
+                    this.classList.add('bg-blue-600', 'text-white');
+                    
+                    // In a real implementation, you would filter tips here
+                    // For this demo, we'll just log the category
+                    console.log('Filtering by:', this.textContent.trim());
+                });
+            });
+        });
+    </script>
+</body>
+</html>
